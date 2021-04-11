@@ -18,6 +18,7 @@ import { USWeather } from "./us_weather";
 import { Weatherbit } from "./weatherbit";
 import { Yahoo } from "./yahoo";
 import { MetNorway } from "./met_norway";
+import { YandexWeather } from "./yandexWeather";
 import { HttpLib, HttpError, Method, HTTPParams, HTTPHeaders } from "./httpLib";
 import { Log } from "./logger";
 import { APPLET_ICON, REFRESH_ICON } from "./consts";
@@ -383,43 +384,53 @@ export class WeatherApplet extends TextIconApplet {
 	 * @param force Force provider re initialization
 	 */
 	private EnsureProvider(force: boolean = false): void {
-		let currentName = this.provider?.name;
-		switch (this.config._dataService) {
+		const currentProviderName = this.provider?.name;
+		const newProviderName = this.config._dataService;
+
+		if (currentProviderName == newProviderName && !force){
+			return;
+		}
+
+		switch (newProviderName) {
 			case "DarkSky":           // No City Info
-				if (currentName != "DarkSky" || force) this.provider = new DarkSky(this);
+				this.provider = new DarkSky(this);
 				break;
 			case "OpenWeatherMap":   // No City Info
-				if (currentName != "OpenWeatherMap" || force) this.provider = new OpenWeatherMap(this);
+				this.provider = new OpenWeatherMap(this);
 				break;
 			case "MetNorway":         // No TZ or city info
-				if (currentName != "MetNorway" || force) this.provider = new MetNorway(this);
+				this.provider = new MetNorway(this);
 				break;
 			case "Weatherbit":
-				if (currentName != "Weatherbit" || force) this.provider = new Weatherbit(this);
+				this.provider = new Weatherbit(this);
 				break;
 			case "Yahoo":
-				if (currentName != "Yahoo" || force) this.provider = new Yahoo(this);
+				this.provider = new Yahoo(this);
 				break;
 			case "ClimacellV4":
-				if (currentName != "ClimacellV4" || force) this.provider = new ClimacellV4(this);
+				this.provider = new ClimacellV4(this);
 				break;
 			case "Climacell":
-				if (currentName != "Climacell" || force) this.provider = new Climacell(this);
+				this.provider = new Climacell(this);
 				break;
 			case "Met Office UK":
-				if (currentName != "Met Office UK" || force) this.provider = new MetUk(this);
+				this.provider = new MetUk(this);
 				break;
 			case "US Weather":
-				if (currentName != "US Weather" || force) this.provider = new USWeather(this);
+				this.provider = new USWeather(this);
 				break;
 			case "Visual Crossing":
-				if (currentName != "Visual Crossing" || force) this.provider = new VisualCrossing(this);
+				this.provider = new VisualCrossing(this);
 				break;
 			case "DanishMI":
-				if (currentName != "DanishMI" || force) this.provider = new DanishMI(this);
+				this.provider = new DanishMI(this);
+				break;
+			case "YandexWeather":
+				this.provider = new YandexWeather(this);
 				break;
 			default:
-				return null;
+				Log.Instance.Debug(`Unknown provider name: ${newProviderName}, current provider was not changed`);
+				break;
 		}
 	}
 
