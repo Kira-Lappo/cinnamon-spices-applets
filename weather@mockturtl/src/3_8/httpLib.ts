@@ -24,10 +24,10 @@ export class HttpLib {
 	}
 
 	/**
-	 * Handles obtaining JSON over http. 
+	 * Handles obtaining JSON over http.
 	 */
-	public async LoadJsonAsync<T>(url: string, params?: HTTPParams, method: Method = "GET"): Promise<Response<T>> {
-		let response = await this.LoadAsync(url, params, method);
+	public async LoadJsonAsync<T>(url: string, params?: HTTPParams, method: Method = "GET", headers?: HTTPHeaders): Promise<Response<T>> {
+		let response = await this.LoadAsync(url, params, method, headers);
 
 		if (!response.Success)
 			return response;
@@ -51,10 +51,10 @@ export class HttpLib {
 	}
 
 	/**
-	 * Handles obtaining data over http. 
+	 * Handles obtaining data over http.
 	 */
-	public async LoadAsync(url: string, params?: HTTPParams, method: Method = "GET"): Promise<GenericResponse> {
-		let message = await this.Send(url, params, method);
+	public async LoadAsync(url: string, params?: HTTPParams, method: Method = "GET", headers?: HTTPHeaders): Promise<GenericResponse> {
+		let message = await this.Send(url, params, method, headers);
 
 		let error: HttpError = null;
 
@@ -117,11 +117,11 @@ export class HttpLib {
 
 	/**
 	 * Send a http request
-	 * @param url 
-	 * @param params 
-	 * @param method 
+	 * @param url
+	 * @param params
+	 * @param method
 	 */
-	public async Send(url: string, params?: HTTPParams, method: Method = "GET"): Promise<imports.gi.Soup.Message> {
+	public async Send(url: string, params?: HTTPParams, method: Method = "GET", headers?: HTTPHeaders): Promise<imports.gi.Soup.Message> {
 		// Add params to url
 		if (params != null) {
 			let items = Object.keys(params);
@@ -132,10 +132,22 @@ export class HttpLib {
 			}
 		}
 
-		let query = encodeURI(url);
+		const query = encodeURI(url);
+		const message = Message.new(method, query);
+
+		if (headers){
+			const messageHeaders = message.request_headers;
+			Object.keys(headers).forEach(headerName => {
+				const headerValue = headers[headerName];
+				if (headerValue){
+					messageHeaders.append(headerName, headerValue);
+				}
+			});
+		}
+
 		Log.Instance.Debug("URL called: " + query);
+
 		let data: imports.gi.Soup.Message = await new Promise((resolve, reject) => {
-			let message = Message.new(method, query);
 			this._httpSession.queue_message(message, (session, message) => {
 				resolve(message);
 			});
@@ -169,4 +181,8 @@ export interface HttpError {
 	reason_phrase: string;
 	data?: any;
 	response?: imports.gi.Soup.Message
+}
+
+export interface HTTPHeaders {
+	[key: string]: string;
 }

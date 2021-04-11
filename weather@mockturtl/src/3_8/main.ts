@@ -18,7 +18,7 @@ import { USWeather } from "./us_weather";
 import { Weatherbit } from "./weatherbit";
 import { Yahoo } from "./yahoo";
 import { MetNorway } from "./met_norway";
-import { HttpLib, HttpError, Method, HTTPParams } from "./httpLib";
+import { HttpLib, HttpError, Method, HTTPParams, HTTPHeaders } from "./httpLib";
 import { Log } from "./logger";
 import { APPLET_ICON, REFRESH_ICON } from "./consts";
 import { VisualCrossing } from "./visualcrossing";
@@ -93,7 +93,7 @@ export class WeatherApplet extends TextIconApplet {
 
 	/**
 	 * Main function pulling and refreshing data
-	 * @param rebuild 
+	 * @param rebuild
 	 */
 	public async RefreshWeather(this: WeatherApplet, rebuild: boolean, location?: LocationData): Promise<RefreshState> {
 		try {
@@ -255,8 +255,8 @@ export class WeatherApplet extends TextIconApplet {
 	 * @param HandleError should return true if you want this function to handle errors, else false
 	 * @param method default is GET
 	 */
-	public async LoadJsonAsync<T>(this: WeatherApplet, url: string, params?: HTTPParams, HandleError?: (message: HttpError) => boolean, method: Method = "GET"): Promise<T> {
-		let response = await HttpLib.Instance.LoadJsonAsync<T>(url, params, method);
+	public async LoadJsonAsync<T>(this: WeatherApplet, url: string, params?: HTTPParams, HandleError?: (message: HttpError) => boolean, method: Method = "GET", headers?: HTTPHeaders): Promise<T> {
+		let response = await HttpLib.Instance.LoadJsonAsync<T>(url, params, method, headers);
 
 		if (!response.Success) {
 			// check if caller wants
@@ -354,7 +354,7 @@ export class WeatherApplet extends TextIconApplet {
 
 	/**
 	 * Handles general errors from HTTPLib
-	 * @param error 
+	 * @param error
 	 */
 	private HandleHTTPError(error: HttpError): void {
 		let appletError: AppletError = {

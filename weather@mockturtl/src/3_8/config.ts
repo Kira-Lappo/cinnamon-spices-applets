@@ -35,7 +35,8 @@ export type Services =
 	"Met Office UK" |
 	"US Weather" |
 	"Visual Crossing" |
-	"DanishMI";
+	"DanishMI" |
+    "YandexWeather";
 
 /**
  * Keys matching the ones in settings-schema.json
@@ -280,9 +281,9 @@ export class Config {
 		return (!key || key == "");
 	};
 
-	/** 
+	/**
 	 * @returns LocationData null if failed to obtain
-	 * coordinates. Automatic mode looks up data through ip-api, 
+	 * coordinates. Automatic mode looks up data through ip-api,
 	 * else it returns coordinates if it was entered. If text was entered,
 	 * it looks up coordinates via geolocation api
 	 */
